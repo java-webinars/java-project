@@ -8,16 +8,15 @@ public class StudentOrderValidator
 
         while (true) {
             StudentOrder so = readStudentOrder();
-            System.out.println("Start");
             if(so == null) {
                 break;
             }
-            System.out.println("Finish");
 
             AnswerCityRegister cityAnswer = checkCityRegister(so);
             if (!cityAnswer.success) {
                 //
-                continue;
+                //continue;
+                break;
             }
 
             AnswerWedding wedAnswer = checkWedding(so);
@@ -26,19 +25,20 @@ public class StudentOrderValidator
 
             sendMail(so);
         }
-        System.out.println("Finish 2");
     }
 
     static StudentOrder readStudentOrder() {
         StudentOrder so = new StudentOrder();
-        return null;
+        return so;
     }
 
     static AnswerCityRegister checkCityRegister(StudentOrder so) {
-        System.out.println("CityRegister is running");
-        AnswerCityRegister ans = new AnswerCityRegister();
-        ans.success = false;
-        return ans;
+        CityRegisterValidator crv1 = new CityRegisterValidator();
+        crv1.hostName = "Host1";
+        crv1.login = "Login1";
+        crv1.password = "Password1";
+        AnswerCityRegister ans1 = crv1.checkCityRegister(so);
+        return ans1;
     }
 
     static AnswerWedding checkWedding(StudentOrder so) {
