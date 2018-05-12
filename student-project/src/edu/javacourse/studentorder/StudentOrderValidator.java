@@ -1,3 +1,16 @@
+package edu.javacourse.studentorder;
+
+import edu.javacourse.studentorder.domain.AnswerChildren;
+import edu.javacourse.studentorder.domain.AnswerCityRegister;
+import edu.javacourse.studentorder.domain.AnswerStudent;
+import edu.javacourse.studentorder.domain.AnswerWedding;
+import edu.javacourse.studentorder.domain.StudentOrder;
+import edu.javacourse.studentorder.mail.MailSender;
+import edu.javacourse.studentorder.validator.ChldrenValidator;
+import edu.javacourse.studentorder.validator.CityRegisterValidator;
+import edu.javacourse.studentorder.validator.StudentValidator;
+import edu.javacourse.studentorder.validator.WeddingValidator;
+
 public class StudentOrderValidator
 {
     public static void main(String[] args) {
@@ -35,28 +48,25 @@ public class StudentOrderValidator
     static AnswerCityRegister checkCityRegister(StudentOrder so) {
         CityRegisterValidator crv1 = new CityRegisterValidator();
         crv1.hostName = "Host1";
-        crv1.login = "Login1";
-        crv1.password = "Password1";
         AnswerCityRegister ans1 = crv1.checkCityRegister(so);
         return ans1;
     }
 
     static AnswerWedding checkWedding(StudentOrder so) {
-        System.out.println("Wedding запущен");
-        return new AnswerWedding();
+        WeddingValidator wd = new WeddingValidator();
+        return wd.checkWedding(so);
     }
 
     static AnswerChildren checkChildren(StudentOrder so) {
-        System.out.println("Children Check is running");
-        return new AnswerChildren();
+        ChldrenValidator cv = new ChldrenValidator();
+        return cv.checkChildren(so);
     }
 
     static AnswerStudent checkStudent(StudentOrder so) {
-        System.out.println("Студенты проверяются");
-        return new AnswerStudent();
+        return new StudentValidator().checkStudent(so);
     }
 
     static void sendMail(StudentOrder so) {
-        System.out.println("Почта отправлена");
+        new MailSender().sendMail(so);
     }
 }
