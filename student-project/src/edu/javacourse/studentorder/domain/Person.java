@@ -4,11 +4,15 @@ import java.time.LocalDate;
 
 public class Person
 {
-    private String surName;
-    private String givenName;
+    protected String surName;
+    protected String givenName;
     private String patronymic;
     private LocalDate dateOfBirth;
     private Address address;
+
+    public String getPersonString() {
+        return surName + " " + givenName;
+    }
 
     public String getSurName() {
         return surName;
