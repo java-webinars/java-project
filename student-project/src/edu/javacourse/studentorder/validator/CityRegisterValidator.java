@@ -10,11 +10,19 @@ public class CityRegisterValidator
     private String login;
     String password;
 
+    private CityRegisterChecker personChecker;
+
+
+    public CityRegisterValidator() {
+        personChecker = new FakeCityRegisterChecker();
+    }
+
     public AnswerCityRegister checkCityRegister(StudentOrder so) {
-        System.out.println("CityRegister is running:"
-                + hostName + "," + login + "," + password);
+        personChecker.checkPerson(so.getHusband());
+        personChecker.checkPerson(so.getWife());
+        personChecker.checkPerson(so.getChild());
+
         AnswerCityRegister ans = new AnswerCityRegister();
-        ans.success = false;
         return ans;
     }
 }
