@@ -1,4 +1,4 @@
-package edu.javacourse.studentorder.domain;
+package edu.javacourse.studentorder.domain.register;
 
 public class AnswerCityRegister
 {
