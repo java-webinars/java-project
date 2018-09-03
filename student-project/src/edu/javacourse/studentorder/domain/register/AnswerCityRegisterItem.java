@@ -4,11 +4,13 @@ import edu.javacourse.studentorder.domain.Person;
 
 public class AnswerCityRegisterItem
 {
-    public enum CityStatus {
+    public enum CityStatus
+    {
         YES, NO, ERROR;
     }
 
-    public static class CityError {
+    public static class CityError
+    {
         private String code;
         private String text;
 
