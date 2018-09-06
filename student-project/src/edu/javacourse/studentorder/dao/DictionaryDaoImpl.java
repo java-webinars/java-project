@@ -1,9 +1,14 @@
 package edu.javacourse.studentorder.dao;
 
+import edu.javacourse.studentorder.config.Config;
 import edu.javacourse.studentorder.domain.Street;
 import edu.javacourse.studentorder.exception.DaoException;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,11 +18,12 @@ public class DictionaryDaoImpl implements DictionaryDao
             "FROM jc_street WHERE UPPER(street_name) LIKE UPPER(?)";
 
     private Connection getConnection() throws SQLException {
-        Connection con = DriverManager.getConnection("jdbc:postgresql://localhost/jc_student",
-                "postgres", "postgres");
+        Connection con = DriverManager.getConnection(
+                Config.getProperty(Config.DB_URL),
+                Config.getProperty(Config.DB_LOGIN),
+                Config.getProperty(Config.DB_PASSWORD));
         return con;
     }
-
 
     public List<Street> findStreets(String pattern) throws DaoException {
         List<Street> result = new LinkedList<>();
