@@ -38,16 +38,15 @@ public class StudentOrderDaoImpl implements StudentOrderDao
                     " ?, ?);";
 
     private static final String INSERT_CHILD =
-    "INSERT INTO jc_student_child(" +
-            " student_order_id, c_sur_name, c_given_name, " +
-            " c_patronymic, c_date_of_birth, c_certificate_number, c_certificate_date, " +
-            " c_register_office_id, c_post_index, c_street_code, c_building, " +
-            " c_extension, c_apartment)" +
-            " VALUES (?, ?, ?, " +
-            " ?, ?, ?, ?, " +
-            " ?, ?, ?, ?, " +
-            " ?, ?)";
-
+            "INSERT INTO jc_student_child(" +
+                    " student_order_id, c_sur_name, c_given_name, " +
+                    " c_patronymic, c_date_of_birth, c_certificate_number, c_certificate_date, " +
+                    " c_register_office_id, c_post_index, c_street_code, c_building, " +
+                    " c_extension, c_apartment)" +
+                    " VALUES (?, ?, ?, " +
+                    " ?, ?, ?, ?, " +
+                    " ?, ?, ?, ?, " +
+                    " ?, ?)";
 
 
     // TODO refactoring - make one method
@@ -66,28 +65,36 @@ public class StudentOrderDaoImpl implements StudentOrderDao
         try (Connection con = getConnection();
              PreparedStatement stmt = con.prepareStatement(INSERT_ORDER, new String[]{"student_order_id"})) {
 
-            // Header
-            stmt.setInt(1, StudentOrderStatus.START.ordinal());
-            stmt.setTimestamp(2, java.sql.Timestamp.valueOf(LocalDateTime.now()));
+            con.setAutoCommit(false);
+            try {
+                // Header
+                stmt.setInt(1, StudentOrderStatus.START.ordinal());
+                stmt.setTimestamp(2, java.sql.Timestamp.valueOf(LocalDateTime.now()));
 
-            // Husband and wife
-            setParamsForAdult(stmt, 3, so.getHusband());
-            setParamsForAdult(stmt, 16, so.getWife());
+                // Husband and wife
+                setParamsForAdult(stmt, 3, so.getHusband());
+                setParamsForAdult(stmt, 16, so.getWife());
 
-            // Marriage
-            stmt.setString(29, so.getMarriageCertificateId());
-            stmt.setLong(30, so.getMarriageOffice().getOfficeId());
-            stmt.setDate(31, java.sql.Date.valueOf(so.getMarriageDate()));
+                // Marriage
+                stmt.setString(29, so.getMarriageCertificateId());
+                stmt.setLong(30, so.getMarriageOffice().getOfficeId());
+                stmt.setDate(31, java.sql.Date.valueOf(so.getMarriageDate()));
 
-            stmt.executeUpdate();
+                stmt.executeUpdate();
 
-            ResultSet gkRs = stmt.getGeneratedKeys();
-            if (gkRs.next()) {
-                result = gkRs.getLong(1);
+                ResultSet gkRs = stmt.getGeneratedKeys();
+                if (gkRs.next()) {
+                    result = gkRs.getLong(1);
+                }
+                gkRs.close();
+
+                saveChildren(con, so, result);
+
+                con.commit();
+            } catch(SQLException ex) {
+                con.rollback();
+                throw ex;
             }
-            gkRs.close();
-
-            saveChildren(con, so, result);
 
         } catch (SQLException ex) {
             throw new DaoException(ex);
