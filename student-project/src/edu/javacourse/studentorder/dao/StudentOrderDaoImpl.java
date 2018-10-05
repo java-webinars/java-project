@@ -91,7 +91,7 @@ public class StudentOrderDaoImpl implements StudentOrderDao
                 saveChildren(con, so, result);
 
                 con.commit();
-            } catch(SQLException ex) {
+            } catch (SQLException ex) {
                 con.rollback();
                 throw ex;
             }
@@ -108,8 +108,9 @@ public class StudentOrderDaoImpl implements StudentOrderDao
             for (Child child : so.getChildren()) {
                 stmt.setLong(1, soId);
                 setParamsForChild(stmt, child);
-                stmt.executeUpdate();
+                stmt.addBatch();
             }
+            stmt.executeBatch();
         }
     }
 
