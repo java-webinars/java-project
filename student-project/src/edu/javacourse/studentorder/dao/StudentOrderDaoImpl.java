@@ -4,10 +4,13 @@ import edu.javacourse.studentorder.config.Config;
 import edu.javacourse.studentorder.domain.Address;
 import edu.javacourse.studentorder.domain.Adult;
 import edu.javacourse.studentorder.domain.Child;
+import edu.javacourse.studentorder.domain.PassportOffice;
 import edu.javacourse.studentorder.domain.Person;
 import edu.javacourse.studentorder.domain.RegisterOffice;
+import edu.javacourse.studentorder.domain.Street;
 import edu.javacourse.studentorder.domain.StudentOrder;
 import edu.javacourse.studentorder.domain.StudentOrderStatus;
+import edu.javacourse.studentorder.domain.University;
 import edu.javacourse.studentorder.exception.DaoException;
 
 import java.sql.Connection;
@@ -119,8 +122,14 @@ public class StudentOrderDaoImpl implements StudentOrderDao
             ResultSet rs = stmt.executeQuery();
             while(rs.next()) {
                 StudentOrder so = new StudentOrder();
+
                 fillStudentOrder(rs, so);
                 fillMarriage(rs, so);
+
+                Adult husband = fillAdult(rs, "h_");
+                Adult wife = fillAdult(rs, "w_");
+                so.setHusband(husband);
+                so.setWife(wife);
 
                 result.add(so);
             }
@@ -131,6 +140,34 @@ public class StudentOrderDaoImpl implements StudentOrderDao
         }
 
         return result;
+    }
+
+    private Adult fillAdult(ResultSet rs, String pref) throws SQLException {
+        Adult adult = new Adult();
+        adult.setSurName(rs.getString(pref + "sur_name"));
+        adult.setGivenName(rs.getString(pref + "given_name"));
+        adult.setPatronymic(rs.getString(pref + "patronymic"));
+        adult.setDateOfBirth(rs.getDate(pref + "date_of_birth").toLocalDate());
+        adult.setPassportSeria(rs.getString(pref + "passport_seria"));
+        adult.setPassportNumber(rs.getString(pref + "passport_number"));
+        adult.setIssueDate(rs.getDate(pref + "passport_date").toLocalDate());
+
+        PassportOffice po = new PassportOffice(rs.getLong(pref + "passport_office_id"), "", "");
+        adult.setIssueDepartment(po);
+        Address adr = new Address();
+        Street st = new Street(rs.getLong(pref + "street_code"), "");
+        adr.setStreet(st);
+        adr.setPostCode(rs.getString(pref + "post_index"));
+        adr.setBuilding(rs.getString(pref + "building"));
+        adr.setExtension(rs.getString(pref + "extension"));
+        adr.setApartment(rs.getString(pref + "apartment"));
+        adult.setAddress(adr);
+
+        University uni = new University(rs.getLong(pref + "university_id"), "");
+        adult.setUnivesity(uni);
+        adult.setStudentId(rs.getString(pref + "student_number"));
+
+        return adult;
     }
 
     private void fillStudentOrder(ResultSet rs, StudentOrder so) throws SQLException {
@@ -177,7 +214,6 @@ public class StudentOrderDaoImpl implements StudentOrderDao
         stmt.setLong(8, child.getIssueDepartment().getOfficeId());
         setParamsForAddress(stmt, 9, child);
     }
-
 
     private void setParamsForPerson(PreparedStatement stmt, int start, Person person) throws SQLException {
         stmt.setString(start, person.getSurName());
