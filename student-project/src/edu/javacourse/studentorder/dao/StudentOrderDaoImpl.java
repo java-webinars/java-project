@@ -55,9 +55,16 @@ public class StudentOrderDaoImpl implements StudentOrderDao
                     " ?, ?)";
 
     private static final String SELECT_ORDERS =
-            "SELECT so.*, ro.r_office_area_id, ro.r_office_name FROM jc_student_order so " +
+            "SELECT so.*, ro.r_office_area_id, ro.r_office_name, " +
+                    "po_h.p_office_area_id as h_p_office_area_id, " +
+                    "po_h.p_office_name as h_p_office_name, " +
+                    "po_w.p_office_area_id as w_p_office_area_id, " +
+                    "po_w.p_office_name as w_p_office_name " +
+                    "FROM jc_student_order so " +
                     "INNER JOIN jc_register_office ro ON ro.r_office_id = so.register_office_id " +
-                    "WHERE student_order_status = 0 ORDER BY student_order_date ";
+                    "INNER JOIN jc_passport_office po_h ON po_h.p_office_id = so.h_passport_office_id " +
+                    "INNER JOIN jc_passport_office po_w ON po_w.p_office_id = so.w_passport_office_id " +
+                    "WHERE student_order_status = 0 ORDER BY student_order_date";
 
 
     // TODO refactoring - make one method
@@ -160,7 +167,7 @@ public class StudentOrderDaoImpl implements StudentOrderDao
         stmt.setString(start + 4, adult_address.getApartment());
     }
 
-    
+
     @Override
     public List<StudentOrder> getStudentOrders() throws DaoException {
         List<StudentOrder> result = new LinkedList<>();
@@ -201,7 +208,10 @@ public class StudentOrderDaoImpl implements StudentOrderDao
         adult.setPassportNumber(rs.getString(pref + "passport_number"));
         adult.setIssueDate(rs.getDate(pref + "passport_date").toLocalDate());
 
-        PassportOffice po = new PassportOffice(rs.getLong(pref + "passport_office_id"), "", "");
+        Long poId = rs.getLong(pref + "passport_office_id");
+        String poArea = rs.getString(pref + "p_office_area_id");
+        String poName = rs.getString(pref + "p_office_name");
+        PassportOffice po = new PassportOffice(poId, poArea, poName);
         adult.setIssueDepartment(po);
         Address adr = new Address();
         Street st = new Street(rs.getLong(pref + "street_code"), "");
