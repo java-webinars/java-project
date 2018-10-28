@@ -21,6 +21,8 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class StudentOrderDaoImpl implements StudentOrderDao
 {
@@ -64,8 +66,14 @@ public class StudentOrderDaoImpl implements StudentOrderDao
                     "INNER JOIN jc_register_office ro ON ro.r_office_id = so.register_office_id " +
                     "INNER JOIN jc_passport_office po_h ON po_h.p_office_id = so.h_passport_office_id " +
                     "INNER JOIN jc_passport_office po_w ON po_w.p_office_id = so.w_passport_office_id " +
-                    "WHERE student_order_status = 0 ORDER BY student_order_date";
+                    "WHERE student_order_status = ? ORDER BY student_order_date";
 
+
+    private static final String SELECT_CHILD =
+            "SELECT soc.*, ro.r_office_area_id, ro.r_office_name " +
+                    "FROM jc_student_child soc " +
+                    "INNER JOIN jc_register_office ro ON ro.r_office_id = soc.c_register_office_id " +
+                    "WHERE soc.student_order_id IN ";
 
     // TODO refactoring - make one method
     private Connection getConnection() throws SQLException {
@@ -175,6 +183,7 @@ public class StudentOrderDaoImpl implements StudentOrderDao
         try (Connection con = getConnection();
              PreparedStatement stmt = con.prepareStatement(SELECT_ORDERS)) {
 
+            stmt.setInt(1, StudentOrderStatus.START.ordinal());
             ResultSet rs = stmt.executeQuery();
             while(rs.next()) {
                 StudentOrder so = new StudentOrder();
@@ -189,6 +198,7 @@ public class StudentOrderDaoImpl implements StudentOrderDao
 
                 result.add(so);
             }
+            findChildren(con, result);
 
             rs.close();
         } catch(SQLException ex) {
@@ -196,6 +206,18 @@ public class StudentOrderDaoImpl implements StudentOrderDao
         }
 
         return result;
+    }
+
+    private void findChildren(Connection con, List<StudentOrder> result) throws SQLException {
+        String cl = "(" + result.stream().map(so -> String.valueOf(so.getStudentOrderId()))
+                .collect(Collectors.joining(",")) + ")";
+
+        try (PreparedStatement stmt = con.prepareStatement(SELECT_CHILD + cl)) {
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()) {
+                System.out.println(rs.getLong(1) + ":" + rs.getString(3));
+            }
+        }
     }
 
     private Adult fillAdult(ResultSet rs, String pref) throws SQLException {
