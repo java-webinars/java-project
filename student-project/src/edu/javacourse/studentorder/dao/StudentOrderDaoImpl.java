@@ -69,7 +69,7 @@ public class StudentOrderDaoImpl implements StudentOrderDao
                     "INNER JOIN jc_register_office ro ON ro.r_office_id = so.register_office_id " +
                     "INNER JOIN jc_passport_office po_h ON po_h.p_office_id = so.h_passport_office_id " +
                     "INNER JOIN jc_passport_office po_w ON po_w.p_office_id = so.w_passport_office_id " +
-                    "WHERE student_order_status = ? ORDER BY student_order_date";
+                    "WHERE student_order_status = ? ORDER BY student_order_date LIMIT ?";
 
     private static final String SELECT_CHILD =
             "SELECT soc.*, ro.r_office_area_id, ro.r_office_name " +
@@ -90,7 +90,7 @@ public class StudentOrderDaoImpl implements StudentOrderDao
                     "INNER JOIN jc_passport_office po_w ON po_w.p_office_id = so.w_passport_office_id " +
                     "INNER JOIN jc_student_child soc ON soc.student_order_id = so.student_order_id " +
                     "INNER JOIN jc_register_office ro_c ON ro_c.r_office_id = soc.c_register_office_id " +
-                    "WHERE student_order_status = ? ORDER BY student_order_date";
+                    "WHERE student_order_status = ? ORDER BY so.student_order_id LIMIT ?";
 
 
     // TODO refactoring - make one method
@@ -209,7 +209,11 @@ public class StudentOrderDaoImpl implements StudentOrderDao
             Map<Long, StudentOrder> maps = new HashMap<>();
 
             stmt.setInt(1, StudentOrderStatus.START.ordinal());
+            int limit = Integer.parseInt(Config.getProperty(Config.DB_LIMIT));
+            stmt.setInt(2, limit);
+
             ResultSet rs = stmt.executeQuery();
+            int counter = 0;
             while(rs.next()) {
                 Long soId = rs.getLong("student_order_id");
                 if (!maps.containsKey(soId)) {
@@ -220,6 +224,10 @@ public class StudentOrderDaoImpl implements StudentOrderDao
                 }
                 StudentOrder so = maps.get(soId);
                 so.addChild(fillChild(rs));
+                counter++;
+            }
+            if (counter >= limit) {
+                result.remove(result.size() - 1);
             }
 
             rs.close();
@@ -237,6 +245,7 @@ public class StudentOrderDaoImpl implements StudentOrderDao
              PreparedStatement stmt = con.prepareStatement(SELECT_ORDERS)) {
 
             stmt.setInt(1, StudentOrderStatus.START.ordinal());
+            stmt.setInt(2, Integer.parseInt(Config.getProperty(Config.DB_LIMIT)));
             ResultSet rs = stmt.executeQuery();
             while(rs.next()) {
                 StudentOrder so = getFullStudentOrder(rs);
