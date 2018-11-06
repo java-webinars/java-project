@@ -27,7 +27,7 @@ public class DictionaryDaoImplTest
         List<String> str1 = Files.readAllLines(Paths.get(url1.toURI()));
         String sql1 = str1.stream().collect(Collectors.joining());
 
-        List<String> str2 = Files.readAllLines(Paths.get(url1.toURI()));
+        List<String> str2 = Files.readAllLines(Paths.get(url2.toURI()));
         String sql2 = str2.stream().collect(Collectors.joining());
 
         try (Connection con = ConnectionBuilder.getConnection();
