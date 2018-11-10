@@ -3,7 +3,7 @@
 <log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
 
     <appender name="fileAppender" class="org.apache.log4j.RollingFileAppender">
-        <param name="maxFileSize" value="1KB"/>
+        <param name="maxFileSize" value="10MB"/>
         <param name="maxBackupIndex" value="2"/>
         <param name="file" value="target/logfile_test.log"/>
         <layout class="org.apache.log4j.PatternLayout">
@@ -12,22 +12,16 @@
         </layout>
     </appender>
 
-    <appender name="fileAppender2" class="org.apache.log4j.RollingFileAppender">
-        <param name="maxFileSize" value="1KB"/>
-        <param name="maxBackupIndex" value="2"/>
-        <param name="file" value="target/logfile_test_2.log"/>
-        <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern"
-                   value="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1} - %m%n"/>
-        </layout>
-    </appender>
-
-
     <category name="edu.javacourse.studentorder">
+        <!--all, trace, debug, info, warn, error, fatal-->
+        <priority value="info"/>
+        <appender-ref ref="fileAppender"/>
+    </category>
+
+    <category name="edu.javacourse.studentorder.dao" additivity="false">
         <!--all, trace, debug, info, warn, error, fatal-->
         <priority value="all"/>
         <appender-ref ref="fileAppender"/>
-        <appender-ref ref="fileAppender2"/>
     </category>
 
 </log4j:configuration>
