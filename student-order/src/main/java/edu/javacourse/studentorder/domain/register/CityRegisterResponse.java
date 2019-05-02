@@ -2,29 +2,29 @@ package edu.javacourse.studentorder.domain.register;
 
 public class CityRegisterResponse
 {
-    private boolean existing;
-    private Boolean temporal;
+    private boolean registered;
+    private boolean temporal;
 
-    public boolean isExisting() {
-        return existing;
+    public boolean isRegistered() {
+        return registered;
     }
 
-    public void setExisting(boolean existing) {
-        this.existing = existing;
+    public void setRegistered(boolean registered) {
+        this.registered = registered;
     }
 
-    public Boolean getTemporal() {
+    public boolean isTemporal() {
         return temporal;
     }
 
-    public void setTemporal(Boolean temporal) {
+    public void setTemporal(boolean temporal) {
         this.temporal = temporal;
     }
 
     @Override
     public String toString() {
         return "CityRegisterResponse{" +
-                "existing=" + existing +
+                "registered=" + registered +
                 ", temporal=" + temporal +
                 '}';
     }
